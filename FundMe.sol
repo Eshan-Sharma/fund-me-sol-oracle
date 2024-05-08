@@ -28,6 +28,28 @@ contract FundMe{
        
     }
 
-    function withdraw() public{}
+    function withdraw() public{
+        for (uint256 funderIndex = 0; funderIndex < funders.length;funderIndex++){
+            address funder = funders[funderIndex];
+            addressToAmountFunded[funder] = 0;
+        }
+        funders = new address[](0);
+        //withdraw the funds, 3 ways
+        //transfer
+        //msg.address, type of address
+        //payable(msg.address), type of payable address
+        payable(msg.sender).transfer(address(this).balance);
+
+        //send
+        bool sendSuccess = payable(msg.sender).send(address(this).balance);
+        require(sendSuccess, "Send failed");
+
+        //call
+        (bool callSuccess, ) = payable(msg.sender).call{value:address(this).balance}("");
+        require(callSuccess,"Call failed");
+
+
+        
+    }
     
 }
