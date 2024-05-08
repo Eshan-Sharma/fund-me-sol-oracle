@@ -65,5 +65,12 @@ contract FundMe{
         //checks if there is anything else?
         //nope, ends
     }
+
+    receive() external payable { 
+        fund();
+    }
+    fallback() external payable { 
+        fund();
+    }
     
 }
