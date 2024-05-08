@@ -7,6 +7,7 @@ pragma solidity ^0.8.18;
 
 import {PriceConverter} from "./PriceConverter.sol";
 
+error NotOwner();
 contract FundMe{
     address public immutable i_owner;
     constructor(){
@@ -58,7 +59,8 @@ contract FundMe{
     }
 
     modifier onlyOwner(){//this is executed first, kinda like middleware in js
-        require(msg.sender == i_owner, "Sender is not owner!");//executed
+        // require(msg.sender == i_owner, "Sender is not owner!");//executed
+        if(msg.sender != i_owner) { revert NotOwner(); }
         _;//goes back to the function definition
         //checks if there is anything else?
         //nope, ends
