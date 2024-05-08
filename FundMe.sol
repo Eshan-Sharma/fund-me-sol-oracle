@@ -8,6 +8,10 @@ pragma solidity ^0.8.18;
 import {PriceConverter} from "./PriceConverter.sol";
 
 contract FundMe{
+    address public owner;
+    constructor(){
+        owner = msg.sender;
+    }
     using PriceConverter for uint256;
     uint256 public minimumUsd = 5 * 1e18;//Instead of minimum ETH, let's set minimum Usd value
     address[] public funders;
@@ -28,7 +32,7 @@ contract FundMe{
        
     }
 
-    function withdraw() public{
+    function withdraw() public onlyOwner{
         for (uint256 funderIndex = 0; funderIndex < funders.length;funderIndex++){
             address funder = funders[funderIndex];
             addressToAmountFunded[funder] = 0;
@@ -38,11 +42,11 @@ contract FundMe{
         //transfer
         //msg.address, type of address
         //payable(msg.address), type of payable address
-        payable(msg.sender).transfer(address(this).balance);
+        // payable(msg.sender).transfer(address(this).balance);
 
-        //send
-        bool sendSuccess = payable(msg.sender).send(address(this).balance);
-        require(sendSuccess, "Send failed");
+        // //send
+        // bool sendSuccess = payable(msg.sender).send(address(this).balance);
+        // require(sendSuccess, "Send failed");
 
         //call
         (bool callSuccess, ) = payable(msg.sender).call{value:address(this).balance}("");
@@ -50,6 +54,13 @@ contract FundMe{
 
 
         
+    }
+
+    modifier onlyOwner(){//this is executed first, kinda like middleware in js
+        require(msg.sender==owner, "Sender is not owner!");//executed
+        _;//goes back to the function definition
+        //checks if there is anything else?
+        //nope, ends
     }
     
 }
