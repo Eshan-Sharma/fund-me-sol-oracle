@@ -8,12 +8,13 @@ pragma solidity ^0.8.18;
 import {PriceConverter} from "./PriceConverter.sol";
 
 contract FundMe{
-    address public owner;
+    address public immutable i_owner;
     constructor(){
-        owner = msg.sender;
+        i_owner = msg.sender;
     }
     using PriceConverter for uint256;
-    uint256 public minimumUsd = 5 * 1e18;//Instead of minimum ETH, let's set minimum Usd value
+    // Using constant - it is constant at compile time and no longer takes up storage spot
+    uint256 public constant MINIMUM_USD = 50 * 1e18;//Instead of minimum ETH, let's set minimum Usd value
     address[] public funders;
     mapping (address funder => uint256 amountFunded) public addressToAmountFunded;
 
@@ -21,7 +22,7 @@ contract FundMe{
         // Allow users to send $
         // Have a minimum $ sent
         
-        require(msg.value.getConversionRate() >= minimumUsd, "didn't send enough ETH");// 1e18 = 1ETH = 1000000000000000000 = 1 * 10 ** 18
+        require(msg.value.getConversionRate() >= MINIMUM_USD, "didn't send enough ETH");// 1e18 = 1ETH = 1000000000000000000 = 1 * 10 ** 18
         funders.push(msg.sender);
         addressToAmountFunded[msg.sender] = addressToAmountFunded[msg.sender] + msg.value;
         // What is a revert?
@@ -57,7 +58,7 @@ contract FundMe{
     }
 
     modifier onlyOwner(){//this is executed first, kinda like middleware in js
-        require(msg.sender==owner, "Sender is not owner!");//executed
+        require(msg.sender == i_owner, "Sender is not owner!");//executed
         _;//goes back to the function definition
         //checks if there is anything else?
         //nope, ends
